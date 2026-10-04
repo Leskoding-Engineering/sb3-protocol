@@ -1,0 +1,52 @@
+{
+  "name": "@schoola/sb3-protocol",
+  "version": "0.1.0",
+  "description": "Typed postMessage protocol and client for talking to @schoola/sb3-host from a parent page: open, reset, load, download and grade .sb3 projects. Contains no editor code.",
+  "license": "MIT",
+  "author": "Leskoding Engineering",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Leskoding-Engineering/sb3-protocol"
+  },
+  "keywords": [
+    "sb3",
+    "postmessage",
+    "iframe",
+    "protocol",
+    "autograder",
+    "education",
+    "typescript"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "peerDependencies": {
+    "vite": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2"
+  }
+}
