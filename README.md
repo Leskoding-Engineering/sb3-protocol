@@ -33,6 +33,19 @@ client.onReady(async () => {
 })
 ```
 
+### Other frameworks (e.g. Next.js)
+
+`@schoola/sb3-protocol/node` copies the same files into any static folder. Run it before `dev`/`build`:
+
+```js
+// scripts/sync-sb3-host.mjs
+import { copySb3Host } from '@schoola/sb3-protocol/node'
+
+copySb3Host({ outDir: 'public', base: '/sb3-host/', sourceMaps: false })
+```
+
+Then point the iframe at `/sb3-host/index.html` (the page uses relative URLs) and git-ignore the copied files.
+
 ## Checks
 
 Each check has a `label` (shown to students) and `points`. The score is the sum of points of passing checks.
