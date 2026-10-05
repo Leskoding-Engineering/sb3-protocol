@@ -8,14 +8,49 @@
 export type Check = { label: string; points: number } & (
   // Static: inspected from the project. Only blocks attached to a hat block (event) count.
   | { type: 'usesBlock'; opcode: string | string[]; min?: number }
+  /** A block (any of `opcode`) placed inside a C-block / container (any of `parent`), e.g. "if" inside "forever" */
+  | { type: 'blockInside'; opcode: string | string[]; parent: string | string[] }
   | { type: 'hasSprite'; name: string }
   | { type: 'spriteCount'; min: number }
+  | { type: 'costumeCount'; sprite: string; min: number }
   | { type: 'hasVariable'; name: string }
-  // Runtime: observed while the project runs (green flag).
+  | { type: 'hasList'; name: string }
+  /** A custom block ("My Blocks") is defined and used; optionally with a name */
+  | { type: 'customBlock'; name?: string }
+  /** A message is broadcast and received by a script; optionally a specific message */
+  | { type: 'broadcastPair'; message?: string }
+  // Runtime: observed while the project runs (green flag, then the optional input scenario).
   | { type: 'says'; text: string; sprite?: string }
+  | { type: 'saysInOrder'; texts: string[]; sprite?: string }
   | { type: 'touches'; sprite: string; other: string } // other: sprite name or '_edge_'
+  | { type: 'touchesColor'; sprite: string; color: string } // color: '#rrggbb'
   | { type: 'moves'; sprite: string; minDistance: number }
+  | { type: 'reachesPosition'; sprite: string; x: number; y: number; tolerance?: number }
+  | { type: 'changesCostume'; sprite: string }
+  | { type: 'switchesBackdrop' }
+  | { type: 'playsSound'; sprite?: string }
+  | { type: 'createsClones'; sprite: string; min: number }
+  | { type: 'drawsWithPen'; sprite?: string }
   | { type: 'variableEquals'; name: string; value: number | string }
+  | { type: 'variableChanges'; name: string; min?: number }
+  | { type: 'listContains'; name: string; value: number | string }
+)
+
+/** Keys an input scenario can press */
+export type InputKey =
+  | 'space' | 'enter' | 'left arrow' | 'right arrow' | 'up arrow' | 'down arrow'
+  | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm'
+  | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+  | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+
+/**
+ * One step of the input scenario played while grading, `at` seconds after the green flag:
+ * hold a key, click a sprite (or '_stage_'), or answer the pending "ask and wait".
+ */
+export type InputStep = { at: number } & (
+  | { action: 'press'; key: InputKey; duration?: number }
+  | { action: 'click'; sprite: string }
+  | { action: 'answer'; text: string }
 )
 
 export interface CheckResult {
@@ -37,9 +72,15 @@ export type HostRequest =
   | { method: 'reset' }
   | { method: 'loadFile'; file: Blob }
   | { method: 'download'; filename: string }
-  | { method: 'grade'; checks: Check[]; runSeconds: number }
+  /** Current project as an .sb3 file, e.g. to upload it */
+  | { method: 'export' }
+  | { method: 'grade'; checks: Check[]; runSeconds: number; inputs?: InputStep[] }
 
-export type HostResult<M extends HostRequest['method']> = M extends 'grade' ? GradeResult : null
+export type HostResult<M extends HostRequest['method']> = M extends 'grade'
+  ? GradeResult
+  : M extends 'export'
+    ? Blob
+    : null
 
 export const READY = 'sb3-host:ready'
 export const REQUEST = 'sb3-host:request'
